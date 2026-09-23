@@ -1,0 +1,18 @@
+# Build output
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# Logs
+*.log
+
+# Local secret files - never commit these
+.env
+application-local.properties
