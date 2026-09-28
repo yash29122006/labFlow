@@ -86,12 +86,17 @@ import { getErrorMessage } from '../../../core/utils/error-handler.util';
                 <h3 class="text-sm font-semibold text-[#0B1F44]">{{ a.title }}</h3>
                 <span class="badge" [ngClass]="a.isOpen ? 'badge-open' : 'badge-closed'">{{ a.isOpen ? 'OPEN' : 'CLOSED' }}</span>
                 <span class="text-[11px] font-mono text-[#64748B]">#{{ a.id }}</span>
-                <span *ngIf="a.dueDate" class="text-[11px] font-mono text-[#64748B]">Due: {{ a.dueDate }}</span>
               </div>
               <p class="text-xs text-[#64748B] mt-1 line-clamp-2">{{ a.description }}</p>
-              <details *ngIf="a.instructions" class="mt-2 text-xs">
-                <summary class="text-blue-600 font-medium cursor-pointer select-none">View Instructions</summary>
-                <div class="mt-1.5 text-[11px] bg-[#F8FAFC] p-2.5 rounded border border-[#E5EAF2] font-mono whitespace-pre-wrap max-h-40 overflow-y-auto">{{ a.instructions }}</div>
+              <details *ngIf="a.details" class="mt-2 text-xs">
+                <summary class="text-blue-600 font-medium cursor-pointer select-none">View Lab Details</summary>
+                <div class="mt-2 space-y-2 text-[11px]">
+                  <div><strong>1. AIM:</strong> {{ a.details?.aim }}</div>
+                  <div><strong>2. THEORY:</strong> {{ a.details?.theory }}</div>
+                  <div><strong>4. LEARNING OUTCOMES:</strong> {{ a.details?.learningOutcomes }}</div>
+                  <div><strong>5. COURSE OUTCOMES:</strong> {{ a.details?.courseOutcomes }}</div>
+                  <div><strong>6. CONCLUSION:</strong> {{ a.details?.conclusion }}</div>
+                </div>
               </details>
             </div>
           }

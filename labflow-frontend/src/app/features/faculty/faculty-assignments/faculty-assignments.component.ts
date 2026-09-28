@@ -60,7 +60,6 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
               <tr class="bg-[#F8FAFC] border-b border-[#E5EAF2] text-[#64748B] font-semibold text-[11px] uppercase tracking-wider">
                 <th class="py-3.5 px-4 w-12 text-center">#</th>
                 <th class="py-3.5 px-4">Title</th>
-                <th class="py-3.5 px-4">Due Date</th>
                 <th class="py-3.5 px-4 text-center">Quiz Limit</th>
                 <th class="py-3.5 px-4 text-center">Status</th>
                 <th class="py-3.5 px-4 text-right">Actions</th>
@@ -75,7 +74,6 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
                     {{ a.description }}
                   </div>
                 </td>
-                <td class="py-3.5 px-4 font-mono text-[#64748B]">{{ a.dueDate || '—' }}</td>
                 <td class="py-3.5 px-4 text-center font-mono text-[#64748B]">
                   {{ a.quizTimeLimitMinutes ? a.quizTimeLimitMinutes + ' mins' : '30 mins' }}
                 </td>
@@ -149,15 +147,36 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
               />
             </div>
 
-            <div>
-              <label for="instructions" class="form-label">Instructions & Problem Statement *</label>
-              <textarea
-                id="instructions"
-                rows="4"
-                formControlName="instructions"
-                placeholder="Detailed instructions, input/output specifications, constraints..."
-                class="form-textarea font-mono text-xs"
-              ></textarea>
+            <div class="rounded-xl border border-[#E5EAF2] bg-[#F8FAFC] p-4 space-y-4">
+              <div>
+                <div class="text-sm font-bold text-[#0B1F44]">Assignment Details</div>
+                <p class="text-[11px] text-[#64748B] mt-0.5">Provide the lab-report content students will see on the assignment page.</p>
+              </div>
+
+              <div>
+                <label for="aim" class="form-label">1. AIM *</label>
+                <textarea id="aim" rows="3" formControlName="aim" placeholder="State the objective of the lab experiment..." class="form-textarea text-xs"></textarea>
+              </div>
+
+              <div>
+                <label for="theory" class="form-label">2. THEORY *</label>
+                <textarea id="theory" rows="6" formControlName="theory" placeholder="Explain the concepts, algorithms, formulas, or background theory..." class="form-textarea text-xs"></textarea>
+              </div>
+
+              <div>
+                <label for="learningOutcomes" class="form-label">4. LEARNING OUTCOMES *</label>
+                <textarea id="learningOutcomes" rows="4" formControlName="learningOutcomes" placeholder="What the student should learn or demonstrate after completing the lab..." class="form-textarea text-xs"></textarea>
+              </div>
+
+              <div>
+                <label for="courseOutcomes" class="form-label">5. COURSE OUTCOMES *</label>
+                <textarea id="courseOutcomes" rows="4" formControlName="courseOutcomes" placeholder="Course-level outcomes demonstrated by completing this assignment..." class="form-textarea text-xs"></textarea>
+              </div>
+
+              <div>
+                <label for="conclusion" class="form-label">6. CONCLUSION *</label>
+                <textarea id="conclusion" rows="3" formControlName="conclusion" placeholder="Summarize what was implemented and submitted..." class="form-textarea text-xs"></textarea>
+              </div>
             </div>
 
             <!-- Subject Multi-select (only on create; subject links are kept on edit) -->
@@ -176,29 +195,16 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
               </div>
             </div>
 
-            <!-- Due Date & Quiz Time Limit -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label for="dueDate" class="form-label">Due Date (Optional)</label>
-                <input
-                  id="dueDate"
-                  type="date"
-                  formControlName="dueDate"
-                  class="form-input text-xs font-mono"
-                />
-              </div>
-
-              <div>
-                <label for="quizTimeLimit" class="form-label">Quiz Limit (Mins)</label>
-                <input
-                  id="quizTimeLimit"
-                  type="number"
-                  min="5"
-                  formControlName="quizTimeLimitMinutes"
-                  placeholder="30"
-                  class="form-input text-xs font-mono"
-                />
-              </div>
+            <div>
+              <label for="quizTimeLimit" class="form-label">Quiz Limit (Mins)</label>
+              <input
+                id="quizTimeLimit"
+                type="number"
+                min="5"
+                formControlName="quizTimeLimitMinutes"
+                placeholder="30"
+                class="form-input text-xs font-mono"
+              />
             </div>
 
             <!-- Open Now Switch -->
@@ -259,9 +265,12 @@ export class FacultyAssignmentsComponent implements OnInit {
   assignmentForm: FormGroup = this.fb.group({
     title: ['', [Validators.required]],
     description: ['', [Validators.required]],
-    instructions: ['', [Validators.required]],
+    aim: ['', [Validators.required]],
+    theory: ['', [Validators.required]],
+    learningOutcomes: ['', [Validators.required]],
+    courseOutcomes: ['', [Validators.required]],
+    conclusion: ['', [Validators.required]],
     isOpen: [true],
-    dueDate: [''],
     quizTimeLimitMinutes: [30]
   });
 
@@ -295,9 +304,12 @@ export class FacultyAssignmentsComponent implements OnInit {
     this.assignmentForm.reset({
       title: '',
       description: '',
-      instructions: '',
+      aim: '',
+      theory: '',
+      learningOutcomes: '',
+      courseOutcomes: '',
+      conclusion: '',
       isOpen: true,
-      dueDate: '',
       quizTimeLimitMinutes: 30
     });
     this.isModalOpen = true;
@@ -309,9 +321,12 @@ export class FacultyAssignmentsComponent implements OnInit {
     this.assignmentForm.patchValue({
       title: a.title,
       description: a.description,
-      instructions: a.instructions,
+      aim: a.details?.aim || '',
+      theory: a.details?.theory || '',
+      learningOutcomes: a.details?.learningOutcomes || '',
+      courseOutcomes: a.details?.courseOutcomes || '',
+      conclusion: a.details?.conclusion || '',
       isOpen: a.isOpen,
-      dueDate: a.dueDate || '',
       quizTimeLimitMinutes: a.quizTimeLimitMinutes || 30
     });
     this.isModalOpen = true;
@@ -345,11 +360,16 @@ export class FacultyAssignmentsComponent implements OnInit {
     const req: AssignmentRequest = {
       title: this.assignmentForm.value.title,
       description: this.assignmentForm.value.description,
-      instructions: this.assignmentForm.value.instructions,
       isOpen: !!this.assignmentForm.value.isOpen,
       subjectIds: this.selectedSubjectIds.length > 0 ? this.selectedSubjectIds : undefined,
-      dueDate: this.assignmentForm.value.dueDate || undefined,
-      quizTimeLimitMinutes: this.assignmentForm.value.quizTimeLimitMinutes ? Number(this.assignmentForm.value.quizTimeLimitMinutes) : undefined
+      quizTimeLimitMinutes: this.assignmentForm.value.quizTimeLimitMinutes ? Number(this.assignmentForm.value.quizTimeLimitMinutes) : undefined,
+      details: {
+        aim: this.assignmentForm.value.aim,
+        theory: this.assignmentForm.value.theory,
+        learningOutcomes: this.assignmentForm.value.learningOutcomes,
+        courseOutcomes: this.assignmentForm.value.courseOutcomes,
+        conclusion: this.assignmentForm.value.conclusion
+      }
     };
 
     if (this.editingAssignmentId) {

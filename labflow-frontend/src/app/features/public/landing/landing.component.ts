@@ -141,7 +141,7 @@ import { RouterModule } from '@angular/router';
               </div>
               <h3 class="text-base font-bold text-[#0B1F44]">Subjects & Assignments</h3>
               <p class="text-xs text-[#475569] mt-2 leading-relaxed">
-                Organize assignments by department, year, and semester. Faculty can set due dates, instructions, and open/close controls.
+                Organize assignments by department, year, and semester. Faculty can define lab details and manage open/close controls.
               </p>
             </div>
 

@@ -1,22 +1,28 @@
+export interface AssignmentDetails {
+  aim: string;
+  theory: string;
+  learningOutcomes: string;
+  courseOutcomes: string;
+  conclusion: string;
+}
+
 export interface AssignmentRequest {
   title: string;
   description: string;
-  instructions: string;
   isOpen: boolean;
   subjectIds?: number[];
-  dueDate?: string;
   quizTimeLimitMinutes?: number;
+  details: AssignmentDetails;
 }
 
 export interface Assignment {
   id: number;
   title: string;
   description: string;
-  instructions: string;
   isOpen: boolean;
-  dueDate?: string;
   quizTimeLimitMinutes?: number;
   subjectId?: number;
   subjectCode?: string;
   subjectTitle?: string;
+  details?: AssignmentDetails;
 }

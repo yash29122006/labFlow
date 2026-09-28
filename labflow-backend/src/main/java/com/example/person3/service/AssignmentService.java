@@ -1,15 +1,18 @@
 package com.example.person3.service;
 
+import com.example.person3.dto.AssignmentDetailsRequest;
 import com.example.person3.dto.AssignmentRequest;
 import com.example.person3.entity.Assignment;
+import com.example.person3.entity.AssignmentDetails;
 import com.example.person3.entity.SubjectAssignment;
+import com.example.person3.repository.AssignmentDetailsRepository;
 import com.example.person3.repository.AssignmentRepository;
 import com.example.person3.repository.SubjectAssignmentRepository;
 import com.example.person3.repository.SubjectRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -21,16 +24,19 @@ import java.util.Set;
 public class AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
+    private final AssignmentDetailsRepository assignmentDetailsRepository;
     private final SubjectRepository subjectRepository;
     private final SubjectAssignmentRepository subjectAssignmentRepository;
     private final AcademicAccessService academicAccessService;
 
     public AssignmentService(
             AssignmentRepository assignmentRepository,
+            AssignmentDetailsRepository assignmentDetailsRepository,
             SubjectRepository subjectRepository,
             SubjectAssignmentRepository subjectAssignmentRepository,
             AcademicAccessService academicAccessService) {
         this.assignmentRepository = assignmentRepository;
+        this.assignmentDetailsRepository = assignmentDetailsRepository;
         this.subjectRepository = subjectRepository;
         this.subjectAssignmentRepository = subjectAssignmentRepository;
         this.academicAccessService = academicAccessService;
@@ -47,8 +53,9 @@ public class AssignmentService {
         Assignment assignment = new Assignment();
         apply(request, assignment);
         Assignment saved = assignmentRepository.save(assignment);
-
         saveSubjectLinks(saved.getId(), request.getSubjectIds());
+        saveDetails(saved.getId(), request.getDetails());
+        attachDetails(saved);
         return saved;
     }
 
@@ -67,7 +74,9 @@ public class AssignmentService {
     }
 
     public Optional<Assignment> getAssignmentById(Long id) {
-        return assignmentRepository.findById(id);
+        Optional<Assignment> optional = assignmentRepository.findById(id);
+        optional.ifPresent(this::attachDetails);
+        return optional;
     }
 
     public Assignment getAssignmentByIdForFaculty(Long id, Long facultyId) {
@@ -75,6 +84,7 @@ public class AssignmentService {
                 .orElseThrow(() -> new RuntimeException("Assignment not found"));
 
         academicAccessService.requireFacultyAssignmentAccess(facultyId, id);
+        attachDetails(assignment);
         return assignment;
     }
 
@@ -83,7 +93,6 @@ public class AssignmentService {
                 .orElseThrow(() -> new RuntimeException("Assignment not found"));
 
         academicAccessService.requireStudentAssignmentAccess(studentId, id);
-
         if (!Boolean.TRUE.equals(assignment.getIsOpen())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
@@ -91,6 +100,7 @@ public class AssignmentService {
             );
         }
 
+        attachDetails(assignment);
         return assignment;
     }
 
@@ -116,14 +126,12 @@ public class AssignmentService {
             Long id,
             AssignmentRequest request,
             Long facultyId) {
-
         Optional<Assignment> optional = assignmentRepository.findById(id);
         if (optional.isEmpty()) {
             return Optional.empty();
         }
 
         Assignment assignment = optional.get();
-
         List<Long> targetSubjectIds;
         if (request.getSubjectIds() != null) {
             validateSubjectIds(request.getSubjectIds());
@@ -147,7 +155,10 @@ public class AssignmentService {
             saveSubjectLinks(id, request.getSubjectIds());
         }
 
-        return Optional.of(assignmentRepository.save(assignment));
+        Assignment saved = assignmentRepository.save(assignment);
+        saveDetails(saved.getId(), request.getDetails());
+        attachDetails(saved);
+        return Optional.of(saved);
     }
 
     @Transactional
@@ -158,6 +169,7 @@ public class AssignmentService {
 
         academicAccessService.requireFacultyAssignmentAccess(facultyId, id);
         subjectAssignmentRepository.deleteByAssignmentId(id);
+        assignmentDetailsRepository.deleteById(id);
         assignmentRepository.deleteById(id);
         return true;
     }
@@ -177,18 +189,17 @@ public class AssignmentService {
         }
 
         academicAccessService.requireFacultyAssignmentAccess(facultyId, id);
-
         Assignment assignment = optional.get();
         assignment.setIsOpen(value);
-        return Optional.of(assignmentRepository.save(assignment));
+        Assignment saved = assignmentRepository.save(assignment);
+        attachDetails(saved);
+        return Optional.of(saved);
     }
 
     private void apply(AssignmentRequest request, Assignment assignment) {
         assignment.setTitle(request.getTitle());
         assignment.setDescription(request.getDescription());
-        assignment.setInstructions(request.getInstructions());
         assignment.setIsOpen(request.getIsOpen());
-        assignment.setDueDate(request.getDueDate());
         assignment.setQuizTimeLimitMinutes(request.getQuizTimeLimitMinutes());
     }
 
@@ -214,5 +225,30 @@ public class AssignmentService {
         }
 
         subjectAssignmentRepository.saveAll(links);
+    }
+
+    private void saveDetails(Long assignmentId, AssignmentDetailsRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Assignment details are required");
+        }
+
+        AssignmentDetails details = assignmentDetailsRepository
+                .findById(assignmentId)
+                .orElseGet(AssignmentDetails::new);
+
+        details.setAssignmentId(assignmentId);
+        details.setAim(request.getAim());
+        details.setTheory(request.getTheory());
+        details.setLearningOutcomes(request.getLearningOutcomes());
+        details.setCourseOutcomes(request.getCourseOutcomes());
+        details.setConclusion(request.getConclusion());
+
+        assignmentDetailsRepository.save(details);
+    }
+
+    private void attachDetails(Assignment assignment) {
+        assignmentDetailsRepository
+                .findById(assignment.getId())
+                .ifPresent(assignment::setDetails);
     }
 }

@@ -72,15 +72,15 @@ import { getErrorMessage } from '../../../core/utils/error-handler.util';
             </div>
           </div>
 
-          @if (assignment?.instructions) {
-            <details class="mt-3 text-xs border-t border-stone-light pt-2">
-              <summary class="text-pine font-medium cursor-pointer select-none">
-                View Assignment Instructions & Problem Statement
-              </summary>
-              <div class="mt-2 p-3 bg-paper rounded border border-stone-border font-mono text-[11px] whitespace-pre-wrap leading-relaxed">
-                {{ assignment?.instructions }}
-              </div>
-            </details>
+          @if (assignment?.details) {
+            <div class="mt-3 p-3 rounded-md bg-paper border border-stone-border space-y-2">
+              <div class="text-[10px] uppercase tracking-wider font-semibold text-stone">Assignment Lab Details</div>
+              <div class="text-[11px] leading-relaxed text-ink whitespace-pre-wrap"><strong>1. AIM:</strong> {{ assignment?.details?.aim }}</div>
+              <div class="text-[11px] leading-relaxed text-ink whitespace-pre-wrap"><strong>2. THEORY:</strong> {{ assignment?.details?.theory }}</div>
+              <div class="text-[11px] leading-relaxed text-ink whitespace-pre-wrap"><strong>4. LEARNING OUTCOMES:</strong> {{ assignment?.details?.learningOutcomes }}</div>
+              <div class="text-[11px] leading-relaxed text-ink whitespace-pre-wrap"><strong>5. COURSE OUTCOMES:</strong> {{ assignment?.details?.courseOutcomes }}</div>
+              <div class="text-[11px] leading-relaxed text-ink whitespace-pre-wrap"><strong>6. CONCLUSION:</strong> {{ assignment?.details?.conclusion }}</div>
+            </div>
           }
         </div>
       </div>

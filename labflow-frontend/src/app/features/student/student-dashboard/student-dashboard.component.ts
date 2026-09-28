@@ -19,7 +19,6 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
 interface StudentAssignmentRow {
   assignment: Assignment;
   subjectName: string;
-  dueDate: string;
   status: 'Evaluated' | 'Submitted' | 'Pending' | 'Not Started';
   statusClass: string;
 }
@@ -107,7 +106,6 @@ interface StudentAssignmentRow {
                 <th class="py-3 px-4 w-12 text-center">#</th>
                 <th class="py-3 px-4">Title</th>
                 <th class="py-3 px-4">Subject</th>
-                <th class="py-3 px-4">Due Date</th>
                 <th class="py-3 px-4 text-center">Status</th>
                 <th class="py-3 px-4 text-right">Action</th>
               </tr>
@@ -121,7 +119,6 @@ interface StudentAssignmentRow {
                   </a>
                 </td>
                 <td class="py-3.5 px-4 text-[#475569]">{{ row.subjectName }}</td>
-                <td class="py-3.5 px-4 font-mono text-[#64748B]">{{ row.dueDate }}</td>
                 <td class="py-3.5 px-4 text-center">
                   <span class="badge" [ngClass]="row.statusClass">
                     {{ row.status }}
@@ -260,7 +257,6 @@ export class StudentDashboardComponent implements OnInit {
       return {
         assignment: a,
         subjectName: subjectMap.get(a.id) || 'General Lab',
-        dueDate: a.dueDate || '—',
         status,
         statusClass
       };

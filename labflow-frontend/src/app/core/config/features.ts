@@ -1,5 +1,4 @@
 export interface FeatureFlags {
-  dueDates: boolean;
   quizTimeLimit: boolean;
   submissionMeta: boolean;
   studentsAdmin: boolean;
@@ -8,7 +7,6 @@ export interface FeatureFlags {
 }
 
 export const features: FeatureFlags = {
-  dueDates: true,
   quizTimeLimit: true,
   submissionMeta: true,
   studentsAdmin: true,
